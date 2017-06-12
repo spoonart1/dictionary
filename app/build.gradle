@@ -1,0 +1,131 @@
+buildscript {
+  repositories {
+    maven { url 'https://maven.fabric.io/public' }
+  }
+
+  dependencies {
+    classpath 'io.fabric.tools:gradle:1.+'
+  }
+}
+
+apply plugin: 'com.android.application'
+
+repositories {
+  maven { url 'https://maven.fabric.io/public' }
+}
+
+//apply plugin: 'io.fabric'
+apply plugin: 'com.getkeepsafe.dexcount'
+apply plugin: 'org.moallemi.advanced-build-version'
+//apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'me.tatarka.retrolambda'
+
+advancedVersioning {
+  nameOptions {
+    versionMajor 1
+    versionMinor 0
+    versionPatch 0
+    versionBuild 1
+  }
+  codeOptions {
+    versionCodeType org.moallemi.gradle.internal.VersionCodeType.AUTO_INCREMENT_ONE_STEP
+  }
+  outputOptions {
+    renameOutput true
+    nameFormat '${appName}-${buildType}-${versionName}'
+  }
+}
+
+def appVersionName = advancedVersioning.versionName
+def appVersionCode = advancedVersioning.versionCode
+
+android {
+  compileSdkVersion 25
+  buildToolsVersion "25.0.2"
+  defaultConfig {
+    applicationId "com.spoonart.kamusslang"
+    minSdkVersion 16
+    targetSdkVersion 25
+    versionCode 1
+    versionName "1.0"
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    resValue "string", "tray__authority", "${applicationId}.tray"
+
+    versionCode appVersionCode
+    versionName appVersionName
+
+  }
+  buildTypes {
+    release {
+      minifyEnabled true
+      shrinkResources true
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+    debug{
+      minifyEnabled false
+    }
+  }
+
+  productFlavors {
+    dev {
+      applicationIdSuffix ".dev"
+      versionName appVersionName + "-dev"
+      buildConfigField 'String', 'SERVER_URL', '"http://localhost:8989/api/scrapper.php"'
+    }
+    production {
+      versionName appVersionName
+      buildConfigField 'String', 'SERVER_URL', '"http://localhost:8989/api/scrapper.php"'
+    }
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+}
+
+dependencies {
+  compile fileTree(dir: 'libs', include: ['*.jar'])
+  compile 'com.google.dagger:dagger:2.4'
+  annotationProcessor "com.google.dagger:dagger-compiler:2.4"
+
+  compile support.appcompat
+  compile support.design
+  compile support.pallete
+
+  compile 'com.android.support.constraint:constraint-layout:1.0.1'
+
+  compile thirdparty.floatingActionMenu
+  compile thirdparty.roundedimageview
+  compile thirdparty.timber
+  compile thirdparty.butterknife
+  compile thirdparty.rxlint
+  compile thirdparty.sqlbrite
+  compile thirdparty.tray
+
+  compile icon.googleIcon
+  compile icon.builder
+
+//  compile chat.qiscus
+
+  compile network.retrofit
+  compile network.interceptor
+  compile network.gson
+  compile network.rxjava
+
+  compile rx.android;
+  compile rx.java;
+
+  compile playservice.analytic
+  compile playservice.ads
+
+  compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
+    transitive = true;
+  }
+
+  compile('com.github.afollestad.material-dialogs:core:0.8.5.8@aar') {
+    transitive = true
+  }
+
+}
